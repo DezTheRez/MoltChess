@@ -37,9 +37,7 @@ class ConnectionManager:
         self.websocket_to_agent: Dict[WebSocket, str] = {}
     
     async def connect_agent(self, websocket: WebSocket, agent_id: str, agent_name: str) -> AgentConnection:
-        """Connect an agent."""
-        await websocket.accept()
-        
+        """Connect an agent. WebSocket must already be accepted."""
         # Disconnect existing connection if any
         if agent_id in self.agents:
             old_conn = self.agents[agent_id]
