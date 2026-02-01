@@ -91,7 +91,7 @@ export default function LiveGame() {
             {endResult.result === 'draw' && "It's a draw!"}
           </p>
           <p className="text-gray-400 mt-2">
-            by {endResult.termination}
+            by {String(endResult.termination || 'unknown')}
           </p>
           <button
             onClick={() => navigate(`/replay/${gameId}`)}

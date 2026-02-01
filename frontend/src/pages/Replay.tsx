@@ -67,11 +67,12 @@ export default function Replay() {
   const goForward = () => setMoveIndex(Math.min(positions.length - 1, moveIndex + 1));
   const goToEnd = () => setMoveIndex(positions.length - 1);
 
-  const resultText = {
+  const resultTextMap: Record<string, string> = {
     white_win: '1-0',
     black_win: '0-1',
     draw: '½-½',
-  }[game.result || ''] || '*';
+  };
+  const resultText = game.result ? resultTextMap[game.result] || '*' : '*';
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
