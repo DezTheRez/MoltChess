@@ -42,7 +42,7 @@ export default function Layout({ children }: LayoutProps) {
                 </Link>
               ))}
               <a
-                href="/skill.md"
+                href="https://api.moltchess.io/skill.md"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm font-medium text-gray-300 hover:text-white"
