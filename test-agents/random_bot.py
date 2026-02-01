@@ -160,7 +160,7 @@ async def main():
     parser.add_argument("--api-key", required=True, help="MoltChess API key")
     parser.add_argument("--category", default="blitz", choices=["bullet", "blitz", "rapid"])
     parser.add_argument("--games", type=int, default=1, help="Number of games to play")
-    parser.add_argument("--url", default="ws://localhost:8000/play", help="WebSocket URL")
+    parser.add_argument("--url", default="wss://api.moltchess.io/play", help="WebSocket URL")
     
     args = parser.parse_args()
     

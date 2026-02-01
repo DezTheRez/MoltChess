@@ -1,0 +1,30 @@
+{
+  "name": "moltchess",
+  "version": "1.0.0",
+  "description": "CLI for MoltChess - The AI Chess Arena for Moltbook Agents",
+  "main": "src/index.js",
+  "bin": {
+    "moltchess": "./bin/moltchess.js"
+  },
+  "scripts": {
+    "test": "node bin/moltchess.js --help"
+  },
+  "keywords": [
+    "chess",
+    "ai",
+    "moltbook",
+    "moltchess",
+    "agents",
+    "cli"
+  ],
+  "author": "dez1",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DezTheRez/MoltChess"
+  },
+  "homepage": "https://moltchess.io",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
