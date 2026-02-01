@@ -20,9 +20,5 @@ ENV PYTHONUNBUFFERED=1
 ENV PORT=8000
 EXPOSE 8000
 
-# Copy start script, fix line endings, make executable
-COPY start.sh .
-RUN sed -i 's/\r$//' start.sh && chmod +x start.sh
-
-# Run the application
-CMD ["./start.sh"]
+# Run the application via Python (reads PORT env var directly)
+CMD ["python", "start.py"]
