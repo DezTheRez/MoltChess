@@ -8,30 +8,40 @@ from ..database import get_db
 router = APIRouter()
 
 
-@router.get("/games/{game_id}")
-async def get_game(game_id: str):
-    """Get a game by ID."""
+# IMPORTANT: /games/live must come BEFORE /games/{game_id} to avoid route conflicts
+@router.get("/games/live")
+async def get_live_games():
+    """Get all currently active games."""
     async with get_db() as db:
         cursor = await db.execute(
             """
-            SELECT g.*,
+            SELECT g.id, g.category, g.started_at,
+                   g.white_agent_id, g.black_agent_id,
                    w.name as white_name, w.avatar_url as white_avatar,
-                   b.name as black_name, b.avatar_url as black_avatar
+                   w.elo_bullet as white_elo_bullet, w.elo_blitz as white_elo_blitz, w.elo_rapid as white_elo_rapid,
+                   b.name as black_name, b.avatar_url as black_avatar,
+                   b.elo_bullet as black_elo_bullet, b.elo_blitz as black_elo_blitz, b.elo_rapid as black_elo_rapid
             FROM games g
             JOIN agents w ON g.white_agent_id = w.id
             JOIN agents b ON g.black_agent_id = b.id
-            WHERE g.id = ?
-            """,
-            (game_id,)
+            WHERE g.status = 'active'
+            ORDER BY g.started_at DESC
+            """
         )
-        game = await cursor.fetchone()
+        games = await cursor.fetchall()
         
-        if not game:
-            raise HTTPException(status_code=404, detail="Game not found")
+        result = []
+        for g in games:
+            game_dict = dict(g)
+            # Add correct Elo based on category
+            category = game_dict["category"]
+            game_dict["white_elo"] = game_dict.get(f"white_elo_{category}", 1200)
+            game_dict["black_elo"] = game_dict.get(f"black_elo_{category}", 1200)
+            result.append(game_dict)
         
         return {
             "success": True,
-            "game": dict(game),
+            "games": result,
         }
 
 
@@ -97,37 +107,28 @@ async def list_games(
         }
 
 
-@router.get("/games/live")
-async def get_live_games():
-    """Get all currently active games."""
+@router.get("/games/{game_id}")
+async def get_game(game_id: str):
+    """Get a game by ID."""
     async with get_db() as db:
         cursor = await db.execute(
             """
-            SELECT g.id, g.category, g.started_at,
-                   g.white_agent_id, g.black_agent_id,
+            SELECT g.*,
                    w.name as white_name, w.avatar_url as white_avatar,
-                   w.elo_bullet as white_elo_bullet, w.elo_blitz as white_elo_blitz, w.elo_rapid as white_elo_rapid,
-                   b.name as black_name, b.avatar_url as black_avatar,
-                   b.elo_bullet as black_elo_bullet, b.elo_blitz as black_elo_blitz, b.elo_rapid as black_elo_rapid
+                   b.name as black_name, b.avatar_url as black_avatar
             FROM games g
             JOIN agents w ON g.white_agent_id = w.id
             JOIN agents b ON g.black_agent_id = b.id
-            WHERE g.status = 'active'
-            ORDER BY g.started_at DESC
-            """
+            WHERE g.id = ?
+            """,
+            (game_id,)
         )
-        games = await cursor.fetchall()
+        game = await cursor.fetchone()
         
-        result = []
-        for g in games:
-            game_dict = dict(g)
-            # Add correct Elo based on category
-            category = game_dict["category"]
-            game_dict["white_elo"] = game_dict.get(f"white_elo_{category}", 1200)
-            game_dict["black_elo"] = game_dict.get(f"black_elo_{category}", 1200)
-            result.append(game_dict)
+        if not game:
+            raise HTTPException(status_code=404, detail="Game not found")
         
         return {
             "success": True,
-            "games": result,
+            "game": dict(game),
         }
