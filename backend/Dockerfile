@@ -16,8 +16,9 @@ RUN mkdir -p /data
 ENV DATABASE_PATH=/data/moltchess.db
 ENV PYTHONUNBUFFERED=1
 
-# Expose port
+# Default port (Railway overrides via $PORT)
+ENV PORT=8000
 EXPOSE 8000
 
-# Run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the application (shell form to expand $PORT)
+CMD uvicorn app.main:app --host 0.0.0.0 --port $PORT
