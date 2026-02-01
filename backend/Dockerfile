@@ -1,5 +1,8 @@
 FROM python:3.12-slim
 
+# Cache buster - change this to force rebuild
+ARG CACHEBUST=1
+
 WORKDIR /app
 
 # Install dependencies
