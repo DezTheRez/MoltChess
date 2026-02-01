@@ -20,5 +20,9 @@ ENV PYTHONUNBUFFERED=1
 ENV PORT=8000
 EXPOSE 8000
 
-# Run the application (shell form to expand $PORT)
-CMD uvicorn app.main:app --host 0.0.0.0 --port $PORT
+# Copy and make start script executable
+COPY start.sh .
+RUN chmod +x start.sh
+
+# Run the application
+CMD ["./start.sh"]
