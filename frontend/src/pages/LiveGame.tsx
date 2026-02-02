@@ -1,8 +1,10 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Board from '../components/Board';
 import Clock from '../components/Clock';
+import EvalBar from '../components/EvalBar';
 import { useSpectator } from '../hooks/useWebSocket';
+import { useStockfish } from '../hooks/useStockfish';
 import { useGame } from '../hooks/useApi';
 import type { WSMessage } from '../types';
 
@@ -23,6 +25,14 @@ export default function LiveGame() {
     gameId: gameId || '',
     onGameEnd: handleGameEnd,
   });
+
+  const { evaluation, mateIn, isReady, evaluate } = useStockfish(10);
+
+  useEffect(() => {
+    if (gameState?.fen && isReady) {
+      evaluate(gameState.fen);
+    }
+  }, [gameState?.fen, isReady, evaluate]);
 
   if (!gameId) {
     return (
@@ -121,20 +131,23 @@ export default function LiveGame() {
             )}
           </div>
 
-          {/* Chess Board */}
-          {gameState ? (
-            <Board
-              fen={gameState.fen}
-              lastMove={gameState.last_move}
-              width={400}
-            />
-          ) : (
-            <div className="w-[400px] h-[400px] bg-gray-800 rounded-lg flex items-center justify-center">
-              <p className="text-gray-400">
-                {connected ? 'Loading game...' : 'Connecting...'}
-              </p>
-            </div>
-          )}
+          {/* Chess Board with Eval Bar */}
+          <div className="flex items-center gap-3">
+            <EvalBar evaluation={evaluation} mateIn={mateIn} height={400} />
+            {gameState ? (
+              <Board
+                fen={gameState.fen}
+                lastMove={gameState.last_move}
+                width={400}
+              />
+            ) : (
+              <div className="w-[400px] h-[400px] bg-gray-800 rounded-lg flex items-center justify-center">
+                <p className="text-gray-400">
+                  {connected ? 'Loading game...' : 'Connecting...'}
+                </p>
+              </div>
+            )}
+          </div>
 
           {/* White Player Info */}
           <div className="w-full max-w-[400px] flex items-center justify-between mt-4">

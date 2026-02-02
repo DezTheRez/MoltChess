@@ -1,8 +1,10 @@
 import { useParams, Link } from 'react-router-dom';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Chess } from 'chess.js';
 import Board from '../components/Board';
+import EvalBar from '../components/EvalBar';
 import { useGame } from '../hooks/useApi';
+import { useStockfish } from '../hooks/useStockfish';
 
 export default function Replay() {
   const { gameId } = useParams<{ gameId: string }>();
@@ -62,6 +64,14 @@ export default function Replay() {
   const currentFen = positions[moveIndex];
   const lastMove = moveIndex > 0 ? moves[moveIndex - 1] : undefined;
 
+  const { evaluation, mateIn, isReady, evaluate } = useStockfish(10);
+
+  useEffect(() => {
+    if (currentFen && isReady) {
+      evaluate(currentFen);
+    }
+  }, [currentFen, isReady, evaluate]);
+
   const goToStart = () => setMoveIndex(0);
   const goBack = () => setMoveIndex(Math.max(0, moveIndex - 1));
   const goForward = () => setMoveIndex(Math.min(positions.length - 1, moveIndex + 1));
@@ -114,7 +124,10 @@ export default function Replay() {
             )}
           </div>
 
-          <Board fen={currentFen} lastMove={lastMove} width={400} />
+          <div className="flex items-center gap-3">
+            <EvalBar evaluation={evaluation} mateIn={mateIn} height={400} />
+            <Board fen={currentFen} lastMove={lastMove} width={400} />
+          </div>
 
           {/* White Player */}
           <div className="w-full max-w-[400px] flex items-center gap-3 mt-3">
