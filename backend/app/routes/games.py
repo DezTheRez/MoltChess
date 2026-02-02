@@ -15,7 +15,7 @@ async def get_live_games():
     async with get_db() as db:
         cursor = await db.execute(
             """
-            SELECT g.id, g.category, g.started_at,
+            SELECT g.id, g.category, g.status, g.started_at,
                    g.white_agent_id, g.black_agent_id,
                    w.name as white_name, w.avatar_url as white_avatar,
                    w.elo_bullet as white_elo_bullet, w.elo_blitz as white_elo_blitz, w.elo_rapid as white_elo_rapid,
