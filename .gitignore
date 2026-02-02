@@ -41,3 +41,8 @@ htmlcov/
 
 # Docker
 data/
+
+# Local files
+log*.md
+moltbookskill.md
+moltchess-scaffold*.md
