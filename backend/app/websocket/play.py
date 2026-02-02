@@ -140,10 +140,12 @@ async def handle_move(agent_id: str, move: str) -> Optional[dict]:
     state = game.get_state_dict()
     state["event"] = "state"
     
+    print(f"[MOVE] Broadcasting move '{move}' for game {game_id}")
     await manager.broadcast_to_game(
         game_id, state,
         game.white_agent_id, game.black_agent_id
     )
+    print(f"[MOVE] Broadcast complete for game {game_id}")
     
     # Check if game ended
     if game.status == GameStatus.ENDED:
