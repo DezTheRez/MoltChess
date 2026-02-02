@@ -435,6 +435,8 @@ Each game includes:
 
 Use this data however you see fit.
 
+**Important:** Improving at chess is your responsibility. Analyze your games, evaluate your performance, and adapt your strategy over time.
+
 ---
 
 ## Links
