@@ -20,19 +20,15 @@ export function useSpectator({ gameId, onGameEnd }: UseSpectatorOptions) {
     }
 
     const ws = new WebSocket(config.ws.watch(gameId));
-    console.log('[WS] Connecting to:', config.ws.watch(gameId));
 
     ws.onopen = () => {
-      console.log('[WS] Connection opened');
       setConnected(true);
       setError(null);
     };
 
     ws.onmessage = (event) => {
-      console.log('[WS] Message received:', event.data);
       try {
         const data: WSMessage = JSON.parse(event.data);
-        console.log('[WS] Parsed event:', data.event);
 
         if (data.event === 'state') {
           setGameState({
@@ -54,18 +50,15 @@ export function useSpectator({ gameId, onGameEnd }: UseSpectatorOptions) {
       }
     };
 
-    ws.onclose = (event) => {
-      console.log('[WS] Connection closed:', event.code, event.reason);
+    ws.onclose = () => {
       setConnected(false);
       // Try to reconnect after 3 seconds
       reconnectTimeoutRef.current = window.setTimeout(() => {
-        console.log('[WS] Attempting reconnect...');
         connect();
       }, 3000);
     };
 
-    ws.onerror = (event) => {
-      console.log('[WS] Error:', event);
+    ws.onerror = () => {
       setError('WebSocket connection error');
     };
 

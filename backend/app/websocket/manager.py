@@ -91,14 +91,11 @@ class ConnectionManager:
         if game_id not in self.spectators:
             self.spectators[game_id] = set()
         self.spectators[game_id].add(websocket)
-        print(f"[SPECTATOR] Connected to game {game_id}. Total spectators: {len(self.spectators[game_id])}")
     
     async def disconnect_spectator(self, websocket: WebSocket, game_id: str):
         """Disconnect a spectator from a game."""
         if game_id in self.spectators:
             self.spectators[game_id].discard(websocket)
-            remaining = len(self.spectators.get(game_id, set()))
-            print(f"[SPECTATOR] Disconnected from game {game_id}. Remaining: {remaining}")
             if not self.spectators[game_id]:
                 del self.spectators[game_id]
     
@@ -109,21 +106,17 @@ class ConnectionManager:
     async def broadcast_to_spectators(self, game_id: str, message: dict):
         """Broadcast a message to all spectators of a game."""
         spectator_set = self.spectators.get(game_id, set())
-        print(f"[BROADCAST] game={game_id} spectators={len(spectator_set)} event={message.get('event')}")
         dead_connections = []
         
         for ws in spectator_set:
             try:
                 await ws.send_json(message)
-                print(f"[BROADCAST] Sent to spectator successfully")
-            except Exception as e:
-                print(f"[BROADCAST] Failed to send to spectator: {e}")
+            except Exception:
                 dead_connections.append(ws)
         
         # Clean up dead connections
         for ws in dead_connections:
             spectator_set.discard(ws)
-            print(f"[BROADCAST] Removed dead connection. Remaining: {len(spectator_set)}")
     
     async def broadcast_to_game(self, game_id: str, message: dict, white_id: str, black_id: str):
         """Broadcast a message to both players and all spectators of a game."""
